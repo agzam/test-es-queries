@@ -1,0 +1,208 @@
+{:versions {:5 {:ver "5.6.9" :port 9205}
+            :7 {:ver "7.9.2" :port 9207}}
+
+ :default-index-mapping
+ {:5
+  {:sample_index
+   {:mappings {:sample_index {:dynamic "false"
+                              :properties {:source {:type "keyword"
+                                                    :normalizer "lowercase_normalizer"}
+                                           :title {:type "text",
+                                                   :fields {:whole {:type "keyword",
+                                                                    :normalizer "lowercase_normalizer"}},
+                                                   :analyzer "text_analyzer",
+                                                   :search_analyzer "search_analyzer",
+                                                   :search_quote_analyzer "text_analyzer"}}}}
+    :settings {:index {:indexing {:slowlog {:threshold {:index {:debug "0s"}}}},
+                       :analysis {:filter {:ctia_stemmer {:split_on_numerics "false",
+                                                          :split_on_case_change "false",
+                                                          :type "word_delimiter",
+                                                          :preserve_original "true",
+                                                          :stem_english_possessive "true",
+                                                          :generate_number_parts "false"},
+                                           :english_stemmer {:type "stemmer",
+                                                             :language "english"},
+                                           :english_stop {:type "stop",
+                                                          :stopwords "_english_"}},
+                                  :normalizer {:lowercase_normalizer {:filter ["lowercase"],
+                                                                      :type "custom",
+                                                                      :char_filter []}},
+                                  :analyzer {:text_analyzer {:filter ["lowercase"
+                                                                      "ctia_stemmer"
+                                                                      "english_stemmer"],
+                                                             :type "custom",
+                                                             :tokenizer "standard"},
+                                             :default {:filter ["lowercase"
+                                                                "ctia_stemmer"
+                                                                "english_stop"
+                                                                "english_stemmer"],
+                                                       :type "custom",
+                                                       :tokenizer "standard"},
+                                             :search_analyzer {:filter ["lowercase"
+                                                                        "ctia_stemmer"
+                                                                        "english_stop"
+                                                                        "english_stemmer"],
+                                                               :type "custom",
+                                                               :tokenizer "standard"}}}}}}}
+  :7
+  {:sample_index
+   {:mappings {:dynamic "false"
+               :properties {:source {:type "keyword"
+                                     :normalizer "lowercase_normalizer"}
+                            :title {:type "text",
+                                    :fields {:whole {:type "keyword",
+                                                     :normalizer "lowercase_normalizer"}},
+                                    :analyzer "text_analyzer",
+                                    :search_analyzer "search_analyzer",
+                                    :search_quote_analyzer "text_analyzer"}}}
+    :settings {:index {:indexing {:slowlog {:threshold {:index {:debug "0s"}}}},
+                       :analysis {:filter {:ctia_stemmer {:split_on_numerics "false",
+                                                          :split_on_case_change "false",
+                                                          :type "word_delimiter",
+                                                          :preserve_original "true",
+                                                          :stem_english_possessive "true",
+                                                          :generate_number_parts "false"},
+                                           :english_stemmer {:type "stemmer",
+                                                             :language "english"},
+                                           :english_stop {:type "stop",
+                                                          :stopwords "_english_"}},
+                                  :normalizer {:lowercase_normalizer {:filter ["lowercase"],
+                                                                      :type "custom",
+                                                                      :char_filter []}},
+                                  :analyzer {:text_analyzer {:filter ["lowercase"
+                                                                      "ctia_stemmer"
+                                                                      "english_stemmer"],
+                                                             :type "custom",
+                                                             :tokenizer "standard"},
+                                             :default {:filter ["lowercase"
+                                                                "ctia_stemmer"
+                                                                "english_stop"
+                                                                "english_stemmer"],
+                                                       :type "custom",
+                                                       :tokenizer "standard"},
+                                             :search_analyzer {:filter ["lowercase"
+                                                                        "ctia_stemmer"
+                                                                        "english_stop"
+                                                                        "english_stemmer"],
+                                                               :type "custom",
+                                                               :tokenizer "standard"}}}}}}}}
+
+ :default-documents {:sample_index
+                     [{:source "ngfw_ips_event_service"
+                       :title "Intrusion event 3:19187:7 incident"}
+                      {:title "Intrusion event 3:1415926:7 incident"
+                       :source "ngfw_ips_event_service"}]}
+ :queries
+ [{:query {:query_string {:query "*"}}}
+
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :analyzer         "whitespace",
+                                 :query            "intrusion \"3:19187:7\""}}}
+
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"3:19187:7\""}}}
+
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "the intrusion \"3:19187:7\""}}}
+
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"the 3:19187:7\""}}}
+  {:query {:simple_query_string {:query            "the intrusion \"3:19187:7\"",
+                                 :analyzer         "search_analyzer",
+                                 :default_operator "and",
+                                 :fields           ["title" "source"]}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :analyzer         "search_analyzer",
+                                 :query            "intrusion \"the 3:19187:7\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"the 3:19187:7 and\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "the intrusion and \"3:19187:7\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "the intrusion \"and 3:19187:7\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :analyzer         "whitespace",
+                                 :query            "the intrusion \"and 3:19187:7\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"\""}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"\"",
+                                 :analyzer         "search_analyzer"}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion \"19187\"",
+                                 :analyzer         "search_analyzer"}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion the \"and 19187\"",
+                                 :analyzer         "search_analyzer"}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion 3\"19187\"7",
+                                 :analyzer         "search_analyzer"}}}
+  {:query {:simple_query_string {:fields           ["title" "source"],
+                                 :default_operator "and",
+                                 :query            "intrusion 7:19187:3",
+                                 :analyzer         "search_analyzer"}}}
+  {:query {:query_string {:fields           ["title" "source"],
+                          :default_operator "and",
+                          :analyzer         "search_analyzer",
+                          :query            "the intrusion \"3:19187:7\""}}}
+  {:query {:query_string {:query            "intrusion \"3:19187:7\"",
+                          :analyzer         "whitespace",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "intrusion \"3:19187:7\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "the intrusion \"3:19187:7\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "intrusion \"the 3:19187:7\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "intrusion \"the 3:19187:7\"",
+                          :analyzer         "search_analyzer",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "the intrusion \"and 3:19187:7\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "the intrusion \"and 3:19187:7\"",
+                          :analyzer         "whitespace",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:query            "intrusion \"\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:fields           ["title" "source"],
+                          :default_operator "and",
+                          :query            "intrusion \"\"",
+                          :analyzer         "search_analyzer"}}}
+  {:query {:query_string {:analyzer         "search_analyzer",
+                          :query            "intrusion \"19187\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:analyzer         "search_analyzer",
+                          :query            "intrusion the \"and 19187\"",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:analyzer         "search_analyzer",
+                          :query            "intrusion 3\"19187\"7",
+                          :default_operator "and",
+                          :fields           ["title" "source"]}}}
+  {:query {:query_string {:fields ["title" "source"],
+                          :default_operator "and",
+                          :query "intrusion 7:19187:3",
+                          :analyzer "search_analyzer"}}}]}

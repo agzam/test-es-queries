@@ -1,0 +1,17 @@
+#+title: Script to test different queries with Elasticsearch
+
+* Preliminaries
+- babashka
+- the script assumes that Elasticsearch instances running on localhost
+* How it works
+Based on queries.edn, it would:
+
+- Delete indices described in ~:default-index-mapping~. Note that the format may differ for different versions of ES
+- Create indices. If a query map has ~:index-mapping~ key (with nested map of ES version keys , similar to ~default-index-mapping~), that mapping would be used, otherwise ~default-index-mapping~.
+- Post some documents, either based on info in ~:documents~ key of the query map, or ~:default-documents~
+- Send a query, print the results
+- Each query map optionally can have ~:versions~ key with a vector of ES versions to run the query. Otherwise posts the query to ES 5 and 7
+* To run the script
+#+begin_src sh
+bb script.clj
+#+end_src
